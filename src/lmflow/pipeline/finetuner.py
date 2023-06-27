@@ -218,16 +218,22 @@ class Finetuner(BaseTuner):
         train_dataset = lm_dataset.get_backend_dataset()
 
         if finetuner_args.do_eval:
-            eval_dataset_args = deepcopy(data_args)
-            eval_dataset_args.dataset_path = finetuner_args.eval_dataset_path
-            eval_dataset = Dataset(eval_dataset_args)
-            with finetuner_args.main_process_first(desc="dataset map tokenization"):
-                tokenized_dataset = model.tokenize(eval_dataset)
-                lm_dataset = self.group_text(
-                    tokenized_dataset,
-                    model_max_length=model.get_max_length(),
-                )
-            eval_dataset = lm_dataset.get_backend_dataset()
+            # eval_dataset_args = deepcopy(data_args)
+            # eval_dataset_args.dataset_path = finetuner_args.eval_dataset_path
+            # eval_dataset = Dataset(eval_dataset_args)
+            # with finetuner_args.main_process_first(desc="dataset map tokenization"):
+            #     tokenized_dataset = model.tokenize(eval_dataset)
+            #     lm_dataset = self.group_text(
+            #         tokenized_dataset,
+            #         model_max_length=model.get_max_length(),
+            #     )
+            # eval_dataset = lm_dataset.get_backend_dataset()
+            ds = train_dataset.train_test_split(
+                test_size=finetuner_args.validation_split_percentage,
+                shuffle=False,
+            )
+            eval_dataset = ds["test"]
+            train_dataset = ds["train"]
 
 
             def preprocess_logits_for_metrics(logits, labels):

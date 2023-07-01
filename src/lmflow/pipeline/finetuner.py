@@ -229,7 +229,7 @@ class Finetuner(BaseTuner):
             #     )
             # eval_dataset = lm_dataset.get_backend_dataset()
             ds = train_dataset.train_test_split(
-                test_size=finetuner_args.validation_split_percentage,
+                test_size=data_args.validation_split_percentage,
                 shuffle=False,
             )
             eval_dataset = ds["test"]
